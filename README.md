@@ -11,7 +11,7 @@
 * Shift+Ctr+C Ctrl+R - replicate the first column of SR to the entire RR, not including columns hidden by grouping
 * Ctrl+C Ctrl+V - insert CR or FR from CB into the selected CR with border expansion including cells hidden by grouping or filters
 * Ctrl+C Ctr+Alt+V - insert CR or FR from CB into the selected CR with border expansion including cells hidden by grouping or filters and selecting the type of insertion
-* Shift+Ctr+C Shift+Ctr+X - Paste RR into SR without extending borders, not including cells hidden by grouping or filters, see PasteX
-* Shift+Ctr+C Shift+Ctr+V - Paste RR into SR without extending borders and pasting values, not including cells hidden by grouping or filters, see PasteV
+* Ctrl+C Shift+Ctr+X - Paste RR into SR without extending borders, not including cells hidden by grouping or filters, see PasteX
+* Ctrl+C Shift+Ctr+V - Paste RR into SR without extending borders and pasting values, not including cells hidden by grouping or filters, see PasteV
 * Alt+F8 SaveAsAddIn Run - Save and set ThisWorkbook as AddIn see SaveAsAddIn
 # [Использование:](https://github.com/abakum/PasteInVisible/blob/master/usage.rus.txt)

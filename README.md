@@ -1,6 +1,6 @@
 # PasteInVisible
 * By Ctrl+C, excel copies consecutive cells to the clipboard. It not excludes cells that are filtered, hidden, or grouped.
-* By Ctrl+V, excel pastes from the clipboard into consecutive rows and columns not only visible but also those that are filtered, hidden or grouped. [Look Note: at bottom](https://support.microsoft.com/en-us/office/copy-visible-cells-only-6e3a1f01-2884-4332-b262-8b814412847e#:~:text=Note%3A%C2%A0Excel%20pastes%20the%20copied%20data%20into%20consecutive%20rows%20or%20columns.)
+* By Ctrl+V, excel pastes from the clipboard into consecutive rows and columns not only visible but also those that are filtered, hidden or grouped. [Note:](https://support.microsoft.com/en-us/office/copy-visible-cells-only-6e3a1f01-2884-4332-b262-8b814412847e#:~:text=Note%3A%C2%A0Excel%20pastes%20the%20copied%20data%20into%20consecutive%20rows%20or%20columns.)
 * To paste  from clipboard in only visible cells use this code.
 # Usage: 
 * Ctrl+C - copy connected (CR) or fragmented range (FR) to clipboard (CB)

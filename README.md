@@ -5,6 +5,7 @@ By Ctrl+V, excel pastes from the clipboard into cells not only visible but also 
 
 To paste  from clipboard in only visible cells use this code.
 
+
 Ctrl+C - copy connected (CR) or fragmented range (FR) to clipboard (CB)
 
 Shift+Ctr+C - convert the selected range (SR) from CR to possibly fragmented by grouping or filters FR and save it as (RR) see SelectVisible

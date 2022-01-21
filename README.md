@@ -3,7 +3,7 @@
 * By Ctrl+V, excel pastes cells from the clipboard into consecutive rows and columns not only visible but also those that are filtered, hidden or grouped. [Note:](https://support.microsoft.com/en-us/office/copy-visible-cells-only-6e3a1f01-2884-4332-b262-8b814412847e#:~:text=Note%3A%C2%A0Excel%20pastes%20the%20copied%20data%20into%20consecutive%20rows%20or%20columns.)
 * To paste cells from clipboard into only visible cells use this code.
 # Usage: 
-* Ctrl+C - copy connected (CR) or fragmented range (FR) to clipboard (CB)
+* Ctrl+C - copy consecutive (CR) or fragmented range (FR) to clipboard (CB)
 * Shift+Ctr+C - convert the selected range (SR) from CR to possibly fragmented by grouping or filters FR and save it as (RR) see SelectVisible [Copy visible cells only](https://support.microsoft.com/en-us/office/copy-visible-cells-only-6e3a1f01-2884-4332-b262-8b814412847e)
 * Ctrl+D - replicate the first row of SR to the whole SR including rows hidden by grouping or filters
 * Shift+Ctr+C Ctrl+D - replicate the first row of SR to the entire RR, not including rows hidden by grouping or filters

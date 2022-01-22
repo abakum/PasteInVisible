@@ -1,13 +1,12 @@
 Attribute VB_Name = "ClipB"
 Option Explicit
+Dim CF_LINK As Long
 Private Const MAXSIZE = 4096
 Private Const GMEM_MOVEABLE As Long = &H2
 Private Const GMEM_ZEROINIT As Long = &H40
 Private Const CF_TEXT = 1
 Private Const CF_LOCALE = 16
 Private Const CF_UNICODETEXT As Long = 13
-Private Const CF_LINK As Long = 49627
-Private Const CF_LINKSOURCE As Long = 49165
 #If VBA7 Then
  'https://github.com/ReneNyffenegger/WinAPI-4-VBA/blob/master/Win32API_PtrSafe.txt
  'https://docs.microsoft.com/ru-ru/office/troubleshoot/office-suite-issues/win32api_ptrsafe-with-64-bit-support
@@ -20,6 +19,7 @@ Private Const CF_LINKSOURCE As Long = 49165
  Private Declare PtrSafe Function EnumClipboardFormats Lib "user32" (ByVal wFormat As Long) As Long
  Private Declare PtrSafe Function EmptyClipboard Lib "user32" () As Long
  Private Declare PtrSafe Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
+ Private Declare PtrSafe Function GetClipboardFormatName Lib "user32" Alias "GetClipboardFormatNameA" (ByVal wFormat As Long, ByVal lpString As String, ByVal nMaxCount As Long) As Long
  
  Private Declare PtrSafe Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As LongPtr) As LongPtr
  Private Declare PtrSafe Function GlobalLock Lib "kernel32" (ByVal hMem As LongPtr) As LongPtr
@@ -40,6 +40,7 @@ Private Const CF_LINKSOURCE As Long = 49165
  Private Declare Function EnumClipboardFormats Lib "user32" (ByVal wFormat As Long) As Long
  Private Declare Function EmptyClipboard Lib "user32" () As Long
  Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
+ Private Declare PtrSafe Function GetClipboardFormatName Lib "user32" Alias "GetClipboardFormatNameA" (ByVal wFormat As Long, ByVal lpString As String, ByVal nMaxCount As Long) As Long
  
  Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
  Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -55,8 +56,8 @@ Private Const CF_LINKSOURCE As Long = 49165
 #End If
 
 Private Sub SetClipboardUT(sUniText As String) 'https://docs.microsoft.com/en-us/office/vba/access/Concepts/Windows-API/send-information-to-the-clipboard
- 'set sUniText as CF_UNICODETEXT and CF_TEXT to Òlipboard
- 'set GetKeyboardLayout as CF_LOCALE to Òlipboard
+ 'set sUniText as CF_UNICODETEXT and CF_TEXT to —Ålipboard
+ 'set GetKeyboardLayout as CF_LOCALE to —Ålipboard
  #If VBA7 Then 'koka
   Dim iStrPtr As LongPtr
   Dim iLen As LongPtr
@@ -82,7 +83,7 @@ End Sub
 
 
 Sub SetClipboard(sUniText As String, Optional ClipboardFormat As Long = CF_UNICODETEXT, Optional KeepClipboard As Boolean = False)
- 'set sUniText as ClipboardFormat to Òlipboard
+ 'set sUniText as ClipboardFormat to —Ålipboard
  #If VBA7 Then 'koka
   Dim iStrPtr As LongPtr
   Dim iLen As LongPtr
@@ -99,7 +100,7 @@ Try:
  Select Case ClipboardFormat
  Case CF_UNICODETEXT, CF_TEXT
   SetClipboardUT sUniText
-  'set GetUserDefaultLCID as CF_LOCALE to Òlipboard
+  'set GetUserDefaultLCID as CF_LOCALE to —Ålipboard
   lLCID = GetUserDefaultLCID
   SetClipboard Chr(lLCID And &HFF) & Chr((lLCID And &HFF00) \ 256) & String$(2, vbNullChar), CF_LOCALE, True
   Exit Sub
@@ -216,40 +217,6 @@ Finally:
  CloseClipboard
 End Function
 
-Public Sub EnumClipboard(iL As Long)
- 'debug.print CF_ with len=iL
- #If VBA7 Then
-  Dim iStrPtr As LongPtr
-  Dim iLen As LongPtr
-  Dim iLock As LongPtr
- #Else
-  Dim iStrPtr As Long
-  Dim iLen As Long
-  Dim iLock As Long
- #End If
- Dim RetVal As Long
- Dim iCF As Long
- On Error GoTo Finally
-Try:
- OpenClipboard 0&
- iCF = 0&
- Do
-  iCF = EnumClipboardFormats(iCF)
-  If iCF = 0 Then Exit Do
-  iStrPtr = GetClipboardData(iCF)
-  If Not IsNull(iStrPtr) Then
-   iLock = GlobalLock(iStrPtr)
-   iLen = GlobalSize(iStrPtr)
-   If iLen = iL Then
-    Debug.Print iCF
-    Debug.Print iLen
-   End If
-   GlobalUnlock iStrPtr
-  End If
- Loop
-Finally:
- CloseClipboard
-End Sub
 
 Public Function ClipBoard_GetData() 'https://docs.microsoft.com/en-us/office/vba/access/concepts/windows-api/retrieve-information-from-the-clipboard
  'get text as CF_TEXT from clipboard
@@ -307,13 +274,14 @@ Function GetClipboardT() As String
 End Function
 
 Function GetClipboardLink() As Range
- 'get range as CF_LINK from clipboard (Excel D:\test\[+^C.xlsb]ÀËÒÚ1 R6C6:R6C7)
+ 'get range as CF_LINK from clipboard (Excel D:\test\[+^C.xlsb]–õ–∏—Å—Ç1 R6C6:R6C7)
  Dim sLink As String
  Dim aLink() As String
  Dim aRange() As String
  Dim aRC() As String
  Dim aRC2() As String
  On Error GoTo Finally
+ If Not CF_LINK Then CF_LINK = getCF("Link")
  sLink = GetClipboard(CF_LINK)
  sLink = Replace(sLink, "[", vbNullChar)
  sLink = Replace(sLink, "]", vbNullChar)
@@ -331,4 +299,42 @@ Function GetClipboardLink() As Range
  End With
 Finally:
 End Function
+Private Sub ClipboardFormats() 'https://stackoverflow.com/questions/50588906/meaning-of-clipboardformat-values-44-and-50
+ Dim fmt As Long
+ Dim fmtName As String
+ 'Dim iClipBoardFormatNumber As Long
 
+ OpenClipboard 0&
+ 'If iClipBoardFormatNumber = 0 Then
+  fmt = EnumClipboardFormats(0)
+  Do While fmt <> 0
+   fmtName = Space(255)
+   GetClipboardFormatName fmt, fmtName, 255
+   fmtName = Trim(fmtName)
+   If fmtName <> vbNullString Then
+    fmtName = Left(fmtName, Len(fmtName) - 1)
+    Debug.Print "fmtName (" & fmt & ") = " & fmtName
+   End If
+   fmt = EnumClipboardFormats(fmt)
+  Loop
+ 'End If
+ 'EmptyClipboard
+ CloseClipboard
+End Sub
+Function getCF(sFormatName) As Long
+ 'get CF_ for sFormatName
+ Dim sName As String
+ On Error GoTo Finally
+Try:
+ OpenClipboard 0&
+ getCF = 0&
+ Do
+  getCF = EnumClipboardFormats(getCF)
+  If getCF = 0 Then Exit Do
+  sName = Space$(Len(sFormatName) + 2)
+  GetClipboardFormatName getCF, sName, Len(sName)
+  If sName = (sFormatName & vbNullChar & " ") Then Exit Do
+ Loop
+Finally:
+ CloseClipboard
+End Function

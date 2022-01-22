@@ -40,7 +40,7 @@ Private Const CF_UNICODETEXT As Long = 13
  Private Declare Function EnumClipboardFormats Lib "user32" (ByVal wFormat As Long) As Long
  Private Declare Function EmptyClipboard Lib "user32" () As Long
  Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
- Private Declare PtrSafe Function GetClipboardFormatName Lib "user32" Alias "GetClipboardFormatNameA" (ByVal wFormat As Long, ByVal lpString As String, ByVal nMaxCount As Long) As Long
+ Private Declare Function GetClipboardFormatName Lib "user32" Alias "GetClipboardFormatNameA" (ByVal wFormat As Long, ByVal lpString As String, ByVal nMaxCount As Long) As Long
  
  Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
  Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long

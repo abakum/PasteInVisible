@@ -1,32 +1,32 @@
 Attribute VB_Name = "PasteInVisible"
 Option Explicit
-Dim rCopy As Range 'ЗД
+Dim rCopy As Range 'Р—Р”
 
 Sub SaveAsAddIn()
  'Alt+F8 SaveAsAddIn
  Dim sName As String
- sName = SplitS(0, Application.ThisWorkbook.Name, ".") 'без расширения
+ sName = SplitS(0, Application.ThisWorkbook.Name, ".") 'Р±РµР· СЂР°СЃС€РёСЂРµРЅРёСЏ
  On Error Resume Next
- Application.AddIns2(sName).Installed = False 'деинсталирую
+ Application.AddIns2(sName).Installed = False 'РґРµРёРЅСЃС‚Р°Р»РёСЂСѓСЋ
  On Error GoTo 0
  DoEvents
- 'сохраняю как AddIn
+ 'СЃРѕС…СЂР°РЅСЏСЋ РєР°Рє AddIn
  Application.ThisWorkbook.SaveAs Filename:=Application.UserLibraryPath & sName & ".xlam", FileFormat:=xlOpenXMLAddIn
  DoEvents
  On Error Resume Next
- Application.AddIns2(sName).Installed = True 'инсталирую
+ Application.AddIns2(sName).Installed = True 'РёРЅСЃС‚Р°Р»РёСЂСѓСЋ
  On Error GoTo 0
 End Sub
 
 Sub WB_BeforeClose()
- 'вызывается из Workbook_BeforeClose
+ 'РІС‹Р·С‹РІР°РµС‚СЃСЏ РёР· Workbook_BeforeClose
  Application.OnKey "+^c"
  Application.OnKey "+^v"
  Application.OnKey "+^x"
 End Sub
 
 Sub WB_Open()
- 'вызывается из Workbook_Open
+ 'РІС‹Р·С‹РІР°РµС‚СЃСЏ РёР· Workbook_Open
  Application.OnKey "+^c", "SelectVisible"
  Application.OnKey "+^v", "PasteV"
  Application.OnKey "+^x", "PasteX"
@@ -34,21 +34,21 @@ End Sub
 
 Sub SelectVisible()
  'Shift+Ctrl+C
- 'связный диапазон (СД) Selection.Areas.Count=1
- 'фрагментированный диапазон (ФД) Selection.Areas.Count>1
- 'выделенный диапазон (ВД) Selection
- 'из ВД в ЗД
+ 'СЃРІСЏР·РЅС‹Р№ РґРёР°РїР°Р·РѕРЅ (РЎР”) Selection.Areas.Count=1
+ 'С„СЂР°РіРјРµРЅС‚РёСЂРѕРІР°РЅРЅС‹Р№ РґРёР°РїР°Р·РѕРЅ (Р¤Р”) Selection.Areas.Count>1
+ 'РІС‹РґРµР»РµРЅРЅС‹Р№ РґРёР°РїР°Р·РѕРЅ (Р’Р”) Selection
+ 'РёР· Р’Р” РІ Р—Р”
  If Selection.Count > 1 Then
-  'преобразовать ВД из СД в возможно фрагментированный группировкой или фильтрами ФД и запомнить его как (ЗД)
+  'РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ Р’Р” РёР· РЎР” РІ РІРѕР·РјРѕР¶РЅРѕ С„СЂР°РіРјРµРЅС‚РёСЂРѕРІР°РЅРЅС‹Р№ РіСЂСѓРїРїРёСЂРѕРІРєРѕР№ РёР»Рё С„РёР»СЊС‚СЂР°РјРё Р¤Р” Рё Р·Р°РїРѕРјРЅРёС‚СЊ РµРіРѕ РєР°Рє (Р—Р”)
   Set rCopy = Selection.SpecialCells(xlVisible)
  Else
   Set rCopy = ActiveCell
  End If
- rCopy.Select 'выделить ЗД для вставки через Ctrl+D или Ctrl+R
- Selection.Copy 'пометить как после Ctrl+C
+ rCopy.Select 'РІС‹РґРµР»РёС‚СЊ Р—Р” РґР»СЏ РІСЃС‚Р°РІРєРё С‡РµСЂРµР· Ctrl+D РёР»Рё Ctrl+R
+ Selection.Copy 'РїРѕРјРµС‚РёС‚СЊ РєР°Рє РїРѕСЃР»Рµ Ctrl+C
 End Sub
 Function min(p As Long, c As Long) As Long
- 'без расширения границ
+ 'Р±РµР· СЂР°СЃС€РёСЂРµРЅРёСЏ РіСЂР°РЅРёС†
  If p <= c Then
   min = p
  Else
@@ -57,19 +57,16 @@ Function min(p As Long, c As Long) As Long
 End Function
 Sub PasteV()
  'Shift+Ctrl+V
- 'только значения из ЗД вставить в ВД
+ 'С‚РѕР»СЊРєРѕ Р·РЅР°С‡РµРЅРёСЏ РёР· Р—Р” РІСЃС‚Р°РІРёС‚СЊ РІ Р’Р”
  PasteX True
 End Sub
 Sub PasteX(Optional val As Boolean = False)
  'Shift+Ctrl+X
- 'ЗД вставить в ВД
+ 'Р—Р” РІСЃС‚Р°РІРёС‚СЊ РІ Р’Р”
  If rCopy Is Nothing Then
   Set rCopy = GetClipboardLink
-  If rCopy Is Nothing Then
-   Set rCopy = ActiveCell
-  Else
-   Set rCopy = rCopy.SpecialCells(xlVisible)
-  End If
+  If rCopy Is Nothing Then Set rCopy = ActiveCell
+  If rCopy.Count > 1 Then Set rCopy = rCopy.SpecialCells(xlVisible)
  End If
  Dim aCalculation As XlCalculation
  aCalculation = Application.Calculation
@@ -80,20 +77,21 @@ Try:
  Dim rPaste As Range
  If Selection Is Nothing Then ActiveCell.Select
  If Selection.Count > 1 Then
-  'вставка ограниченна ВД - границы вставки определены размерами ВД
+  'РІСЃС‚Р°РІРєР° РѕРіСЂР°РЅРёС‡РµРЅРЅР° Р’Р” - РіСЂР°РЅРёС†С‹ РІСЃС‚Р°РІРєРё РѕРїСЂРµРґРµР»РµРЅС‹ СЂР°Р·РјРµСЂР°РјРё Р’Р”
   Set rPaste = Selection.SpecialCells(xlVisible)
  Else
-  'обычная вставка - границы вставки определены размерами ЗД
+  'РѕР±С‹С‡РЅР°СЏ РІСЃС‚Р°РІРєР° - РіСЂР°РЅРёС†С‹ РІСЃС‚Р°РІРєРё РѕРїСЂРµРґРµР»РµРЅС‹ СЂР°Р·РјРµСЂР°РјРё Р—Р”
   With rCopy.Areas(rCopy.Areas.Count)
    Set rPaste = Selection.Resize(.Row + .Rows.Count - rCopy.Areas(1).Row, _
                                  .Column + .Columns.Count - rCopy.Areas(1).Column _
-                                 ).SpecialCells(xlVisible)
+                                 )
+   If rPaste.Count > 1 Then Set rPaste = rPaste.SpecialCells(xlVisible)
   End With
  End If
  Dim p As Long
  For p = 1 To rPaste.Areas.Count
   With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
-   If val Then 'вставка только значений
+   If val Then 'РІСЃС‚Р°РІРєР° С‚РѕР»СЊРєРѕ Р·РЅР°С‡РµРЅРёР№
     .Copy
     Cells(rPaste.Areas(p).Row, rPaste.Areas(p).Column).PasteSpecial Paste:=xlPasteValues
    Else
@@ -115,5 +113,3 @@ Function SplitS(Index As Long, Expression As String, Optional Delimiter As Strin
  aExpression = Split(Expression, Delimiter, Limit, Compare)
  If LBound(aExpression) <= Index And Index <= UBound(aExpression) Then SplitS = aExpression(Index)
 End Function
-
-

@@ -14,5 +14,6 @@
 * Ctrl+C Ctrl+Alt+V - pastes CR or FR from CB to SD including cells hidden by grouping or filtering with choice of insertion type
 * Ctrl+C Shift+Ctr+X - Paste RR into SR without extending borders, not including cells hidden by grouping or filters. Look PasteX
 * Ctrl+C Shift+Ctr+V - Paste RR into SR without extending borders and pasting values, not including cells hidden by grouping or filters. Look PasteV
+* Shift+Ctr+K -  same as in Shift+Ctr+V, but only empty cells (EC) are replaced and only if all key cells (not EC) are equal. Look PasteK
 * Alt+F8 SaveAsAddIn Run - Save and set ThisWorkbook as AddIn. Look SaveAsAddIn
 # [Использование:](https://github.com/abakum/PasteInVisible/blob/master/usage.rus.txt)

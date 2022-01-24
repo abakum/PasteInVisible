@@ -17,7 +17,7 @@
 * Ctrl+C Shift+Ctr+V - Paste RR into SR without extending borders and pasting values, not including cells hidden by grouping or filters. Look PasteV
 * Shift+Ctr+K -  same as in Shift+Ctr+V, but only empty cells (EC) are replaced and only if all key cells (not EC) are equal. Look PasteK
 * Alt+F8 SaveAsAddIn Run - Save and set ThisWorkbook as AddIn. Look SaveAsAddIn
-
+# Сonsolidation example:
 * There is a table Whole that needs to be filled in by different Parts (sections, branches, subdivisions)
 * Red Part1&2 - the result of filling in the table Whole
 * Blue Part3 - the result of filling the table Whole

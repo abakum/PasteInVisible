@@ -144,13 +144,13 @@ Try:
        End If
       Next 'c
      Next 'r
-     If Not bPaste Then
-      MsgBox prompt:="Нечего вставлять", Title:="Ключи равны"
-      GoTo Msg
-     End If
     End If 'paste
    End With
   Next 'p
+  If key And Not bPaste Then
+   MsgBox prompt:="Нечего вставлять", Title:="Ключи равны"
+   GoTo Msg
+  End If
  Next 'paste
  GoTo Finally
 Msg:

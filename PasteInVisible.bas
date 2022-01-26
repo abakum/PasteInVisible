@@ -49,29 +49,34 @@ Sub SelectVisible()
  rCopy.Select 'выделить ЗД для вставки через Ctrl+D или Ctrl+R
  Selection.Copy 'в буфер обмена (БО)
 End Sub
+
 Function min(p As Long, c As Long) As Long
- 'без расширения границ
- If p <= c Then
+ If p < c Then
   min = p
  Else
   min = c
  End If
 End Function
+
 Sub PasteV()
  'Shift+Ctrl+V
- 'только значения из ЗД вставить в ВД
+ 'только значения из ЗД вставляем в ВД
  PasteX True
 End Sub
+
 Sub PasteK()
  'Shift+Ctrl+K
- 'сравнить ключевые(не пустые) видимые поля при совпадении вставить в пустые видимые поля
+ 'ключи это не пустые видимые ячейки ВД и ЗД
+ 'если хоть один ключ ВД отличается от ключа в ЗД значит не вставляем ни чего
+ 'иначе только значения из ЗД вставляем в ВД
  PasteX True, True
 End Sub
+
 Sub PasteX(Optional val As Boolean = False, Optional key As Boolean = False)
  'Shift+Ctrl+X
  'ЗД вставить в ВД
  Dim rCopy As Range 'ЗД
- Dim rPaste As Range
+ Dim rPaste As Range 'ВД
  Dim p As Long
  Dim r As Long
  Dim c As Long
@@ -105,41 +110,48 @@ Try:
  ReDim aPaste(1 To rPaste.Areas.Count) As Boolean
  For paste = CLng(key) + 1 To 1
   For p = 1 To rPaste.Areas.Count
+   'уменьшаем размеры копирования до размеров вставки
    With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
     If paste Then
      If val Then 'вставка только значений
       If Not key Or aPaste(p) Then
        .Copy
+       'только не пустые для консолидации
        Cells(rPaste.Areas(p).Row, rPaste.Areas(p).Column).PasteSpecial paste:=xlPasteValues, SkipBlanks:=key
       End If
      Else
       .Copy Destination:= _
       Cells(rPaste.Areas(p).Row, rPaste.Areas(p).Column)
      End If
-    Else 'сравниваем ключи(не ПЯ)
+    Else 'сравниваем ключи
      ro = -Sgn(rCopy.Areas(p).Row - rPaste.Areas(p).Row) * Abs(rCopy.Areas(p).Row - rPaste.Areas(p).Row)
      co = -Sgn(rCopy.Areas(p).Column - rPaste.Areas(p).Column) * Abs(rCopy.Areas(p).Column - rPaste.Areas(p).Column)
      For r = .Row To .Row + .Rows.Count - 1
       For c = .Column To .Column + .Columns.Count - 1
-       If IsEmpty(Cells(r, c).Offset(ro, co)) And Not IsEmpty(Cells(r, c)) Then
-        bPaste = True
-        aPaste(p) = True
-       Else
-        If Not IsEmpty(Cells(r, c)) And Cells(r, c) <> Cells(r, c).Offset(ro, co) Then
-         MsgBox prompt:=Cells(r, c) & "@" & Cells(r, c).Address & "<>" & Cells(r, c).Offset(ro, co) & "@" & Cells(r, c).Offset(ro, co).Address, Title:="Ключи НЕ равны"
-         GoTo Msg
+       'куда вставлять Cells(r, c).Offset(ro, co) если не пусто значит ключ
+       'откуда Cells(r, c) пустые пропускаем иначе сравниваем с ключом
+       If IsEmpty(Cells(r, c)) Then 'пропускаем
+       Else 'не пропускаемые
+        If IsEmpty(Cells(r, c).Offset(ro, co)) Then 'не ключ
+         bPaste = True 'вставляем вообще
+         aPaste(p) = True 'вставляем в Areas(p)
+        Else 'ключ
+         If Cells(r, c) <> Cells(r, c).Offset(ro, co) Then 'они отличны
+          MsgBox prompt:=Cells(r, c) & "@" & Cells(r, c).Address & "<>" & Cells(r, c).Offset(ro, co) & "@" & Cells(r, c).Offset(ro, co).Address, Title:="Ключи НЕ равны"
+          GoTo Msg
+         End If
         End If
        End If
-      Next
-     Next
-    End If
+      Next 'c
+     Next 'r
+     If Not bPaste Then
+      MsgBox prompt:="Нечего вставлять", Title:="Ключи равны"
+      GoTo Msg
+     End If
+    End If 'paste
    End With
-  Next
-  If key And Not bPaste Then
-   MsgBox prompt:="Нечего вставлять", Title:="Ключи равны"
-   GoTo Msg
-  End If
- Next
+  Next 'p
+ Next 'paste
  GoTo Finally
 Msg:
  Application.ScreenUpdating = True

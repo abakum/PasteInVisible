@@ -18,10 +18,10 @@
 * Shift+Ctr+K -  same as in Shift+Ctr+V, but only empty cells (EC) are replaced and only if all key cells (not EC) are equal. Look PasteK
 * Alt+F8 SaveAsAddIn Run - Save and set ThisWorkbook as AddIn. Look SaveAsAddIn
 # Сonsolidation example:
-* There is a table Whole that needs to be filled in by different Parts (sections, branches, subdivisions)
-* Red Part1&2 - the result of filling in the table Whole
-* Blue Part3 - the result of filling the table Whole
+* There is a table `Whole` that needs to be filled in by different parts (sections, branches, subdivisions)
+* Red `Part1&2` - the result of filling in the table `Whole`
+* Blue `Part3` - the result of filling the table` Whole`
 * If parts in different books open them,
-* filter Whole by Part<3, filter Part1&2 by Part<3, select from Part1&2 Ctrl+C, paste into Whole Shift+Ctrl+K,
-* filter Whole by Part=3, filter Part3 by Part=3, select from Part3 Ctrl+C paste into Whole Shift+Ctrl+K
+* filter `Whole` by Part<3, filter `Part1&2` by Part<3, select from `Part1&2` Ctrl+C, paste into `Whole` Shift+Ctrl+K,
+* filter `Whole` by Part=3, filter `Part3` by Part=3, select from `Part3` Ctrl+C paste into `Whole` Shift+Ctrl+K
 # [Использование:](https://github.com/abakum/PasteInVisible/blob/master/usage.rus.txt)

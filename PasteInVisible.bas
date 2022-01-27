@@ -76,23 +76,20 @@ Sub PasteX(Optional val As Boolean = False, Optional key As Boolean = False)
  'Shift+Ctrl+X
  'ЗД вставить в ВД
  Dim rCopy As Range 'ЗД
+ Dim rCopyK As Range
  Dim rPaste As Range 'ВД
+ Dim rPasteK As Range
  Dim p As Long
  Dim r As Long
  Dim c As Long
  Dim ro As Long
  Dim co As Long
- Dim paste As Long
- Dim bPaste As Boolean
- Dim aPaste() As Boolean
  Dim aCalculation As XlCalculation
  Set rCopy = GetClipboardLink
  If rCopy Is Nothing Then Set rCopy = ActiveCell
  If rCopy.Count > 1 Then Set rCopy = rCopy.SpecialCells(xlVisible)
- aCalculation = Application.Calculation
  On Error GoTo Finally
- Application.ScreenUpdating = False
- Application.Calculation = xlCalculationManual
+ aCalculation = XlCalc()
 Try:
  If Selection Is Nothing Then ActiveCell.Select
  If Selection.Count > 1 Then
@@ -107,63 +104,82 @@ Try:
    If rPaste.Count > 1 Then Set rPaste = rPaste.SpecialCells(xlVisible)
   End With
  End If
- ReDim aPaste(1 To rPaste.Areas.Count) As Boolean
- For paste = CLng(key) + 1 To 1
-  For p = 1 To rPaste.Areas.Count
-   'уменьшаем размеры копирования до размеров вставки
-   With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
-    If paste Then
-     If val Then 'вставка только значений
-      If Not key Or aPaste(p) Then
-       .Copy
-       'только не пустые для консолидации
-       Cells(rPaste.Areas(p).Row, rPaste.Areas(p).Column).PasteSpecial paste:=xlPasteValues, SkipBlanks:=key
-      End If
-     Else
-      .Copy Destination:= _
-      Cells(rPaste.Areas(p).Row, rPaste.Areas(p).Column)
-     End If
-    Else 'сравниваем ключи
-     ro = -Sgn(rCopy.Areas(p).Row - rPaste.Areas(p).Row) * Abs(rCopy.Areas(p).Row - rPaste.Areas(p).Row)
-     co = -Sgn(rCopy.Areas(p).Column - rPaste.Areas(p).Column) * Abs(rCopy.Areas(p).Column - rPaste.Areas(p).Column)
-     For r = .Row To .Row + .Rows.Count - 1
-      For c = .Column To .Column + .Columns.Count - 1
-       'куда вставлять Cells(r, c).Offset(ro, co) если не пусто значит ключ
-       'откуда Cells(r, c) пустые пропускаем иначе сравниваем с ключом
-       If IsEmpty(Cells(r, c)) Then 'пропускаем
-       Else 'не пропускаемые
-        If IsEmpty(Cells(r, c).Offset(ro, co)) Then 'не ключ
-         bPaste = True 'вставляем вообще
-         aPaste(p) = True 'вставляем в Areas(p)
-        Else 'ключ
-         If Cells(r, c) <> Cells(r, c).Offset(ro, co) Then 'они отличны
-          MsgBox prompt:=Cells(r, c) & "@" & Cells(r, c).Address & "<>" & Cells(r, c).Offset(ro, co) & "@" & Cells(r, c).Offset(ro, co).Address, Title:="Ключи НЕ равны"
-          GoTo Msg
-         End If
+ For p = 1 To rPaste.Areas.Count
+  'уменьшаем размеры копирования до размеров вставки
+  With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
+   If key Then 'PasteK
+    'сравниваем ключи
+    ro = -Sgn(rCopy.Areas(p).Row - rPaste.Areas(p).Row) * Abs(rCopy.Areas(p).Row - rPaste.Areas(p).Row)
+    co = -Sgn(rCopy.Areas(p).Column - rPaste.Areas(p).Column) * Abs(rCopy.Areas(p).Column - rPaste.Areas(p).Column)
+    For r = .Row To .Row + .Rows.Count - 1
+     For c = .Column To .Column + .Columns.Count - 1
+      'куда вставлять Cells(r, c).Offset(ro, co) если не пусто значит ключ
+      'откуда Cells(r, c) пустые пропускаем иначе сравниваем с ключом
+      If IsEmpty(Cells(r, c)) Then 'пропускаем
+      Else 'не пропускаемые
+       If IsEmpty(Cells(r, c).Offset(ro, co)) Then 'не ключ
+        If rCopyK Is Nothing Then
+         Set rCopyK = Cells(r, c)
+        Else
+         Set rCopyK = Union(rCopyK, Cells(r, c))
+        End If
+        If rPasteK Is Nothing Then
+         Set rPasteK = Cells(r, c).Offset(ro, co)
+        Else
+         Set rPasteK = Union(rPasteK, Cells(r, c).Offset(ro, co))
+        End If
+       Else 'ключ
+        If Cells(r, c) <> Cells(r, c).Offset(ro, co) Then 'они отличны
+         MsgBox prompt:=Cells(r, c) & "@" & Cells(r, c).Address & "<>" & Cells(r, c).Offset(ro, co) & "@" & Cells(r, c).Offset(ro, co).Address, Title:="Ключи НЕ равны"
+         GoTo KeyD
         End If
        End If
-      Next 'c
-     Next 'r
-    End If 'paste
-   End With
-  Next 'p
-  If key And Not bPaste Then
-   MsgBox prompt:="Нечего вставлять", Title:="Ключи равны"
-   GoTo Msg
-  End If
- Next 'paste
+      End If
+     Next 'c
+    Next 'r
+   Else 'PasteX PasteV
+    If val Then 'вставка только значений
+     If 1 Then 'быстрей
+      rPaste.Areas(p) = .Value
+     Else
+      .Copy
+      Cells(rPaste.Areas(p).Row, rPaste.Areas(p).Column).PasteSpecial paste:=xlPasteValues
+     End If
+    Else
+     .Copy Destination:= _
+     Cells(rPaste.Areas(p).Row, rPaste.Areas(p).Column)
+    End If
+   End If 'key
+  End With
+ Next 'p
+ If key Then
+  If rCopyK Is Nothing Then GoTo KeyE
+  For p = 1 To rCopyK.Areas.Count
+   rPasteK.Areas(p) = rCopyK.Areas(p).Value
+  Next
+ End If
  GoTo Finally
-Msg:
- Application.ScreenUpdating = True
- Application.Calculation = aCalculation
+KeyE:
+ MsgBox prompt:="Нечего вставлять", Title:="Ключи равны"
+KeyD:
+ XlCalc aCalculation
  rCopy.Select
  Selection.Copy
  Exit Sub
 Finally:
- Application.ScreenUpdating = True
- Application.Calculation = aCalculation
- Application.CutCopyMode = False
+ XlCalc aCalculation
 End Sub
+
+Private Function XlCalc(Optional aCalculation As Long = 0) As XlCalculation
+ Application.EnableEvents = aCalculation <> 0
+ Application.ScreenUpdating = aCalculation <> 0
+ If aCalculation = 0 Then
+  XlCalc = Application.Calculation
+  Application.Calculation = xlCalculationManual
+ Else
+  Application.Calculation = aCalculation
+ End If
+End Function
 
 Function SplitS(Index As Long, Expression As String, Optional Delimiter As String = " ", Optional Limit As Long = -1, Optional Compare As VbCompareMethod = vbBinaryCompare) As String
  Dim aExpression() As String

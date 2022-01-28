@@ -25,4 +25,4 @@
 * If parts in different books open them,
 * filter `Whole` by Part<3, filter `Part1&2` by Part<3, select from `Part1&2` Ctrl+C, paste into `Whole` Shift+Ctrl+K,
 * filter `Whole` by Part=3, filter `Part3` by Part=3, select from `Part3` Ctrl+C paste into `Whole` Shift+Ctrl+K
-# [Использование:](https://github.com/abakum/PasteInVisible/blob/master/usage.rus.txt)
+# [Использование, установка, пример консолидации](https://github.com/abakum/PasteInVisible/blob/master/usage.rus.txt)

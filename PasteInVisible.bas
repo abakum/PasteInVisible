@@ -50,14 +50,6 @@ Sub SelectVisible()
  Selection.Copy 'в буфер обмена (БО)
 End Sub
 
-Function min(p As Long, c As Long) As Long
- If p < c Then
-  min = p
- Else
-  min = c
- End If
-End Function
-
 Sub PasteV()
  'Shift+Ctrl+V
  'только значения из ЗД вставляем в ВД
@@ -170,6 +162,45 @@ Finally:
  XlCalc aCalculation
 End Sub
 
+Function SplitS(Index As Long, Expression As String, Optional Delimiter As String = " ", Optional Limit As Long = -1, Optional Compare As VbCompareMethod = vbBinaryCompare) As String
+ Dim aExpression() As String
+ SplitS = ""
+ aExpression = Split(Expression, Delimiter, Limit, Compare)
+ If LBound(aExpression) <= Index And Index <= UBound(aExpression) Then SplitS = aExpression(Index)
+End Function
+
+Sub CopyPaste(rPaste As Range, rCopy As Range, Optional val As Boolean = True)
+ 'https://stackoverflow.com/a/70890803/18055780
+ Dim aCalculation As XlCalculation
+ Dim p As Long
+ On Error GoTo Finally
+ aCalculation = XlCalc()
+ If rPaste.Count = 1 Then
+  With rCopy.Areas(rCopy.Areas.Count)
+   Set rPaste = rPaste.Resize(.Row + .Rows.Count - rCopy.Areas(1).Row, _
+                                 .Column + .Columns.Count - rCopy.Areas(1).Column _
+                                 )
+  End With
+ End If
+ For p = 1 To rPaste.Areas.Count
+  With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
+   If val Then
+    If 1 Then 'faster
+     rPaste.Areas(p) = .Value
+    Else
+     .Copy
+     Cells(rPaste.Areas(p).Row, rPaste.Areas(p).Column).PasteSpecial paste:=xlPasteValues
+    End If
+   Else
+    .Copy Destination:= _
+    Cells(rPaste.Areas(p).Row, rPaste.Areas(p).Column)
+   End If 'val
+  End With
+ Next 'p
+Finally:
+ XlCalc aCalculation
+End Sub
+
 Private Function XlCalc(Optional aCalculation As Long = 0) As XlCalculation
  Application.EnableEvents = aCalculation <> 0
  Application.ScreenUpdating = aCalculation <> 0
@@ -181,9 +212,10 @@ Private Function XlCalc(Optional aCalculation As Long = 0) As XlCalculation
  End If
 End Function
 
-Function SplitS(Index As Long, Expression As String, Optional Delimiter As String = " ", Optional Limit As Long = -1, Optional Compare As VbCompareMethod = vbBinaryCompare) As String
- Dim aExpression() As String
- SplitS = ""
- aExpression = Split(Expression, Delimiter, Limit, Compare)
- If LBound(aExpression) <= Index And Index <= UBound(aExpression) Then SplitS = aExpression(Index)
+Function min(p As Long, c As Long) As Long
+ If p < c Then
+  min = p
+ Else
+  min = c
+ End If
 End Function

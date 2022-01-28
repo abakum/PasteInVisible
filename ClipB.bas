@@ -71,15 +71,15 @@ Sub SetClipboardUT(sUniText As String) 'https://docs.microsoft.com/en-us/office/
   Dim iLen As Long
   Dim iLock As Long
  #End If
- If Not CBool(OpenClipboard(0&)) Then Exit Sub 'koka
+ If IsNull(OpenClipboard(0&)) Then Exit Sub 'koka
  On Error GoTo Finally 'koka
 Try:
  EmptyClipboard
  iLen = LenB(sUniText) + 2&
  iStrPtr = GlobalAlloc(GMEM_MOVEABLE Or GMEM_ZEROINIT, iLen)
- If Not CBool(iStrPtr) Then GoTo Finally 'koka
+ If IsNull(iStrPtr) Then GoTo Finally 'koka
  iLock = GlobalLock(iStrPtr)
- If Not CBool(iLock) Then GoTo Finally 'koka
+ If IsNull(iLock) Then GoTo Finally 'koka
  lstrcpyW iLock, StrPtr(sUniText)
  GlobalUnlock iStrPtr
  SetClipboardData CF_UNICODETEXT, iStrPtr
@@ -108,16 +108,16 @@ Sub SetClipboard(sUniText As String, Optional ClipboardFormat As Long = CF_UNICO
   SetClipboard Chr(lLCID And &HFF) & Chr((lLCID And &HFF00) \ 256) & String$(2, vbNullChar), CF_LOCALE, True
   Exit Sub
  End Select
- If Not CBool(OpenClipboard(0&)) Then Exit Sub
+ If IsNull(OpenClipboard(0&)) Then Exit Sub
  On Error GoTo Finally
 Try:
  If Not KeepClipboard Then EmptyClipboard
  Buffer = StrConv(sUniText, vbFromUnicode)
  iLen = UBound(Buffer) + 1
  iStrPtr = GlobalAlloc(GMEM_MOVEABLE Or GMEM_ZEROINIT, iLen)
- If Not CBool(iStrPtr) Then GoTo Finally
+ If IsNull(iStrPtr) Then GoTo Finally
  iLock = GlobalLock(iStrPtr)
- If Not CBool(iLock) Then GoTo Finally
+ If IsNull(iLock) Then GoTo Finally
  CopyMemory ByVal iLock, Buffer(0), iLen
  GlobalUnlock iStrPtr
  SetClipboardData ClipboardFormat, iStrPtr
@@ -137,14 +137,14 @@ Private Function GetClipboardUT() As String 'https://docs.microsoft.com/en-us/of
   Dim iLock As Long
  #End If
  Dim sUniText As String
- If Not CBool(IsClipboardFormatAvailable(CF_UNICODETEXT)) Then Exit Function
- If Not CBool(OpenClipboard(0&)) Then Exit Function
+ If IsNull(IsClipboardFormatAvailable(CF_UNICODETEXT)) Then Exit Function
+ If IsNull(OpenClipboard(0&)) Then Exit Function
  On Error GoTo Finally
 Try:
  iStrPtr = GetClipboardData(CF_UNICODETEXT)
- If Not CBool(iStrPtr) Then GoTo Finally
+ If IsNull(iStrPtr) Then GoTo Finally
  iLock = GlobalLock(iStrPtr)
- If Not CBool(iLock) Then GoTo Finally
+ If IsNull(iLock) Then GoTo Finally
  iLen = GlobalSize(iStrPtr)
  If iLen Then
   sUniText = String$(iLen \ 2& - 1&, vbNullChar)
@@ -168,14 +168,14 @@ Function GetClipboardU(ClipboardFormat As Long) As String
   Dim iLock As Long
  #End If
  Dim sUniText As String
- If Not CBool(IsClipboardFormatAvailable(ClipboardFormat)) Then Exit Function
- If Not CBool(OpenClipboard(0&)) Then Exit Function
+ If IsNull(IsClipboardFormatAvailable(ClipboardFormat)) Then Exit Function
+ If IsNull(OpenClipboard(0&)) Then Exit Function
  On Error GoTo Finally
 Try:
  iStrPtr = GetClipboardData(ClipboardFormat)
- If Not CBool(iStrPtr) Then GoTo Finally
+ If IsNull(iStrPtr) Then GoTo Finally
  iLock = GlobalLock(iStrPtr)
- If Not CBool(iLock) Then GoTo Finally
+ If IsNull(iLock) Then GoTo Finally
  iLen = GlobalSize(iStrPtr)
  If iLen Then
   sUniText = String$(iLen \ 2& - 1&, vbNullChar)
@@ -204,14 +204,14 @@ Function GetClipboard(Optional ClipboardFormat As Long = CF_UNICODETEXT) As Stri
   GetClipboard = GetClipboardUT
   Exit Function
  End If
- If Not CBool(IsClipboardFormatAvailable(ClipboardFormat)) Then Exit Function
- If Not CBool(OpenClipboard(0&)) Then Exit Function
+ If IsNull(IsClipboardFormatAvailable(ClipboardFormat)) Then Exit Function
+ If IsNull(OpenClipboard(0&)) Then Exit Function
  On Error GoTo Finally
 Try:
  iStrPtr = GetClipboardData(ClipboardFormat)
- If Not CBool(iStrPtr) Then GoTo Finally
+ If IsNull(iStrPtr) Then GoTo Finally
  iLock = GlobalLock(iStrPtr)
- If Not CBool(iLock) Then GoTo Finally
+ If IsNull(iLock) Then GoTo Finally
  iLen = GlobalSize(iStrPtr)
  If iLen Then
   ReDim Buffer(0 To (iLen - 1)) As Byte
@@ -333,7 +333,7 @@ End Sub
 Function getCF(sFormatName) As Long
  'get CF_ for sFormatName
  Dim sName As String
- If Not CBool(OpenClipboard(0&)) Then Exit Function
+ If IsNull(OpenClipboard(0&)) Then Exit Function
  On Error GoTo Finally
 Try:
  getCF = 0&
@@ -358,12 +358,12 @@ Public Function GetClipboardFiles() As String()
  Dim aFiles() As String
  Dim sFileName As String * MAX_PATH
  Dim lFilesCount As Long
- If Not CBool(IsClipboardFormatAvailable(CF_HDROP)) Then Exit Function
- If Not CBool(OpenClipboard(0&)) Then Exit Function
+ If IsNull(IsClipboardFormatAvailable(CF_HDROP)) Then Exit Function
+ If IsNull(OpenClipboard(0&)) Then Exit Function
  On Error GoTo Finally
 Try:
  hDrop = GetClipboardData(CF_HDROP)
- If Not CBool(hDrop) Then GoTo Finally
+ If IsNull(hDrop) Then GoTo Finally
  lFilesCount = DragQueryFile(hDrop, -1, vbNullString, 0)
  ReDim aFiles(lFilesCount - 1)
  For i = 0 To lFilesCount - 1

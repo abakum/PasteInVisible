@@ -169,18 +169,27 @@ Function SplitS(Index As Long, Expression As String, Optional Delimiter As Strin
  If LBound(aExpression) <= Index And Index <= UBound(aExpression) Then SplitS = aExpression(Index)
 End Function
 
+'https://stackoverflow.com/a/70890803/18055780
 Sub CopyPaste(rPaste As Range, rCopy As Range, Optional val As Boolean = True)
- 'https://stackoverflow.com/a/70890803/18055780
  Dim aCalculation As XlCalculation
  Dim p As Long
+ Dim ro As Long
+ Dim co As Long
  On Error GoTo Finally
+Try:
  aCalculation = XlCalc()
  If rPaste.Count = 1 Then
-  With rCopy.Areas(rCopy.Areas.Count)
-   Set rPaste = rPaste.Resize(.Row + .Rows.Count - rCopy.Areas(1).Row, _
-                                 .Column + .Columns.Count - rCopy.Areas(1).Column _
-                                 )
-  End With
+  ro = -Sgn(rCopy.Areas(1).Row - rPaste.Areas(1).Row) * Abs(rCopy.Areas(1).Row - rPaste.Areas(1).Row)
+  co = -Sgn(rCopy.Areas(1).Column - rPaste.Areas(1).Column) * Abs(rCopy.Areas(1).Column - rPaste.Areas(1).Column)
+  For p = 1 To rCopy.Areas.Count
+   With rCopy.Areas(p)
+    If p = 1 Then
+     Set rPaste = Cells(.Row, .Column).Offset(ro, co).Resize(.Rows.Count, .Columns.Count)
+    Else
+     Set rPaste = Union(rPaste, Cells(.Row, .Column).Offset(ro, co).Resize(.Rows.Count, .Columns.Count))
+    End If
+   End With
+  Next 'p
  End If
  For p = 1 To rPaste.Areas.Count
   With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
@@ -219,3 +228,4 @@ Function min(p As Long, c As Long) As Long
   min = c
  End If
 End Function
+

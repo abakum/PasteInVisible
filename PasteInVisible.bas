@@ -68,14 +68,14 @@ Sub PasteX(Optional val As Boolean = False, Optional key As Boolean = False)
  'Shift+Ctrl+X
  'ЗД вставить в ВД
  Dim rCopy As Range 'ЗД
- Dim rCopyK As Range
+ Dim rCU As Range
+ Dim rC As Range
  Dim rPaste As Range 'ВД
- Dim rPasteK As Range
+ Dim rPU As Range
+ Dim rP As Range
  Dim p As Long
  Dim r As Long
  Dim c As Long
- Dim ro As Long
- Dim co As Long
  Dim aCalculation As XlCalculation
  Set rCopy = GetClipboardLink
  If rCopy Is Nothing Then Set rCopy = ActiveCell
@@ -89,40 +89,47 @@ Try:
   Set rPaste = Selection.SpecialCells(xlVisible)
  Else
   'обычная вставка - границы вставки определены размерами ЗД
-  With rCopy.Areas(rCopy.Areas.Count)
-   Set rPaste = Selection.Resize(.Row + .Rows.Count - rCopy.Areas(1).Row, _
-                                 .Column + .Columns.Count - rCopy.Areas(1).Column _
-                                 )
-   If rPaste.Count > 1 Then Set rPaste = rPaste.SpecialCells(xlVisible)
-  End With
+  If 1 Then 'с учётом фрагментации ЗД
+   Set rPaste = Selection
+   r = rPaste.Areas(1).Row - rCopy.Areas(1).Row
+   c = rPaste.Areas(1).Column - rCopy.Areas(1).Column
+   For p = 1 To rCopy.Areas.Count
+    With rCopy.Areas(p)
+     Set rPaste = Union(rPaste, Cells(.Row, .Column).Offset(r, c).Resize(.Rows.Count, .Columns.Count))
+    End With
+   Next 'p
+  Else
+   With rCopy.Areas(rCopy.Areas.Count)
+    Set rPaste = Selection.Resize(.Row + .Rows.Count - rCopy.Areas(1).Row, _
+                                  .Column + .Columns.Count - rCopy.Areas(1).Column)
+   End With
+  End If
+  If rPaste.Count > 1 Then Set rPaste = rPaste.SpecialCells(xlVisible)
  End If
  For p = 1 To rPaste.Areas.Count
   'уменьшаем размеры копирования до размеров вставки
   With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
    If key Then 'PasteK
     'сравниваем ключи
-    ro = -Sgn(rCopy.Areas(p).Row - rPaste.Areas(p).Row) * Abs(rCopy.Areas(p).Row - rPaste.Areas(p).Row)
-    co = -Sgn(rCopy.Areas(p).Column - rPaste.Areas(p).Column) * Abs(rCopy.Areas(p).Column - rPaste.Areas(p).Column)
     For r = .Row To .Row + .Rows.Count - 1
      For c = .Column To .Column + .Columns.Count - 1
-      'куда вставлять Cells(r, c).Offset(ro, co) если не пусто значит ключ
-      'откуда Cells(r, c) пустые пропускаем иначе сравниваем с ключом
-      If IsEmpty(Cells(r, c)) Then 'пропускаем
+      'куда вставлять если не пусто значит ключ
+      Set rP = Cells(r, c).Offset(rPaste.Areas(p).Row - rCopy.Areas(p).Row, _
+                                  rPaste.Areas(p).Column - rCopy.Areas(p).Column)
+      Set rC = Cells(r, c) 'откуда пустые пропускаем иначе сравниваем с ключом
+      If IsEmpty(rC) Then 'пропускаем
       Else 'не пропускаемые
-       If IsEmpty(Cells(r, c).Offset(ro, co)) Then 'не ключ
-        If rCopyK Is Nothing Then
-         Set rCopyK = Cells(r, c)
+       If IsEmpty(rP) Then 'не ключ
+        If rCU Is Nothing Then
+         Set rCU = rC
+         Set rPU = rP
         Else
-         Set rCopyK = Union(rCopyK, Cells(r, c))
-        End If
-        If rPasteK Is Nothing Then
-         Set rPasteK = Cells(r, c).Offset(ro, co)
-        Else
-         Set rPasteK = Union(rPasteK, Cells(r, c).Offset(ro, co))
+         Set rCU = Union(rCU, rC)
+         Set rPU = Union(rPU, rP)
         End If
        Else 'ключ
-        If Cells(r, c) <> Cells(r, c).Offset(ro, co) Then 'они отличны
-         MsgBox prompt:=Cells(r, c) & "@" & Cells(r, c).Address & "<>" & Cells(r, c).Offset(ro, co) & "@" & Cells(r, c).Offset(ro, co).Address, Title:="Ключи НЕ равны"
+        If rC <> rP Then 'они отличны
+         MsgBox prompt:=rC & "@" & rC.Address & "<>" & rP & "@" & rP.Address, Title:="Ключи НЕ равны"
          GoTo KeyD
         End If
        End If
@@ -145,9 +152,9 @@ Try:
   End With
  Next 'p
  If key Then
-  If rCopyK Is Nothing Then GoTo KeyE
-  For p = 1 To rCopyK.Areas.Count
-   rPasteK.Areas(p) = rCopyK.Areas(p).Value
+  If rCU Is Nothing Then GoTo KeyE
+  For p = 1 To rCU.Areas.Count
+   rPU.Areas(p) = rCU.Areas(p).Value
   Next
  End If
  GoTo Finally
@@ -173,21 +180,17 @@ End Function
 Sub CopyPaste(rPaste As Range, rCopy As Range, Optional val As Boolean = True)
  Dim aCalculation As XlCalculation
  Dim p As Long
- Dim ro As Long
- Dim co As Long
+ Dim r As Long
+ Dim c As Long
  On Error GoTo Finally
 Try:
  aCalculation = XlCalc()
  If rPaste.Count = 1 Then
-  ro = -Sgn(rCopy.Areas(1).Row - rPaste.Areas(1).Row) * Abs(rCopy.Areas(1).Row - rPaste.Areas(1).Row)
-  co = -Sgn(rCopy.Areas(1).Column - rPaste.Areas(1).Column) * Abs(rCopy.Areas(1).Column - rPaste.Areas(1).Column)
+  r = rPaste.Areas(1).Row - rCopy.Areas(1).Row
+  c = rPaste.Areas(1).Column - rCopy.Areas(1).Column
   For p = 1 To rCopy.Areas.Count
    With rCopy.Areas(p)
-    If p = 1 Then
-     Set rPaste = Cells(.Row, .Column).Offset(ro, co).Resize(.Rows.Count, .Columns.Count)
-    Else
-     Set rPaste = Union(rPaste, Cells(.Row, .Column).Offset(ro, co).Resize(.Rows.Count, .Columns.Count))
-    End If
+    Set rPaste = Union(rPaste, Cells(.Row, .Column).Offset(r, c).Resize(.Rows.Count, .Columns.Count))
    End With
   Next 'p
  End If
@@ -228,4 +231,3 @@ Function min(p As Long, c As Long) As Long
   min = c
  End If
 End Function
-

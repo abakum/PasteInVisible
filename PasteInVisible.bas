@@ -108,7 +108,8 @@ Try:
  End If
  For p = 1 To rPaste.Areas.Count
   'уменьшаем размеры копирования до размеров вставки
-  With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
+  With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(Application.WorksheetFunction.min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), _
+                                                               Application.WorksheetFunction.min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
    If key Then 'PasteK
     'сравниваем ключи
     For r = .Row To .Row + .Rows.Count - 1
@@ -195,7 +196,8 @@ Try:
   Next 'p
  End If
  For p = 1 To rPaste.Areas.Count
-  With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
+  With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(Application.WorksheetFunction.min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), _
+                                                               Application.WorksheetFunction.min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
    If val Then
     If 1 Then 'faster
      rPaste.Areas(p) = .Value
@@ -221,13 +223,5 @@ Private Function XlCalc(Optional aCalculation As Long = 0) As XlCalculation
   Application.Calculation = xlCalculationManual
  Else
   Application.Calculation = aCalculation
- End If
-End Function
-
-Function min(p As Long, c As Long) As Long
- If p < c Then
-  min = p
- Else
-  min = c
  End If
 End Function

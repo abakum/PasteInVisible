@@ -208,7 +208,7 @@ Sub SaveAsAddIn()
  'Alt+F8 SaveAsAddIn Run
  Dim sName As String
  Dim sFilename As String
- Dim ws As Worksheet
+ Dim o As Object
  On Error GoTo Finally
 Try:
  With Application.ThisWorkbook
@@ -221,8 +221,8 @@ Try:
   SetAttr sFilename, vbNormal
   Kill sFilename
   Application.DisplayAlerts = False
-  For Each ws In .Worksheets  'delete all sheets except the last one
-   ws.Delete
+  For Each o In .Sheets  'delete all sheets except the last one
+   o.Delete
   Next
   .SaveAs Filename:=sFilename, FileFormat:=xlOpenXMLAddIn 'save ThisWorkbook as AddIn
   Application.AddIns(sName).Installed = True 'install ThisWorkbook as AddIn

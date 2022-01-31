@@ -210,8 +210,9 @@ Sub SaveAsAddIn()
  Dim sFilename As String
  Dim ws As Worksheet
  On Error GoTo Finally
+Try:
  With Application.ThisWorkbook
-  sName = SplitS(0, .Name, ".") 'name of ThisWorkbook without extension
+  sName = Split(.Name, ".")(0) 'name of ThisWorkbook without extension
   sFilename = Application.UserLibraryPath & sName & ".xlam"
   .Save
   .Worksheets.Add After:=.Worksheets(.Worksheets.Count) 'add a blank sheet at the end
@@ -232,8 +233,6 @@ Finally:
 End Sub
 
 Function SplitS(Index As Long, Expression As String, Optional Delimiter As String = " ", Optional Limit As Long = -1, Optional Compare As VbCompareMethod = vbBinaryCompare) As String
- Dim aExpression() As String
- SplitS = ""
- aExpression = Split(Expression, Delimiter, Limit, Compare)
- If LBound(aExpression) <= Index And Index <= UBound(aExpression) Then SplitS = aExpression(Index)
+ On Error Resume Next
+ SplitS = Split(Expression, Delimiter, Limit, Compare)(Index)
 End Function

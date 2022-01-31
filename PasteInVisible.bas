@@ -1,22 +1,6 @@
 Attribute VB_Name = "PasteInVisible"
 Option Explicit
 
-Sub SaveAsAddIn()
- 'Alt+F8 SaveAsAddIn Run
- Dim sName As String
- sName = SplitS(0, Application.ThisWorkbook.Name, ".") 'без расширения
- On Error Resume Next
- Application.AddIns2(sName).Installed = False 'деинсталирую
- On Error GoTo 0
- DoEvents
- 'сохраняю как AddIn
- Application.ThisWorkbook.SaveAs Filename:=Application.UserLibraryPath & sName & ".xlam", FileFormat:=xlOpenXMLAddIn
- DoEvents
- On Error Resume Next
- Application.AddIns2(sName).Installed = True 'инсталирую
- On Error GoTo 0
-End Sub
-
 Sub WB_BeforeClose()
  'вызывается из Workbook_BeforeClose
  Application.OnKey "+^c"
@@ -170,13 +154,6 @@ Finally:
  XlCalc aCalculation
 End Sub
 
-Function SplitS(Index As Long, Expression As String, Optional Delimiter As String = " ", Optional Limit As Long = -1, Optional Compare As VbCompareMethod = vbBinaryCompare) As String
- Dim aExpression() As String
- SplitS = ""
- aExpression = Split(Expression, Delimiter, Limit, Compare)
- If LBound(aExpression) <= Index And Index <= UBound(aExpression) Then SplitS = aExpression(Index)
-End Function
-
 'https://stackoverflow.com/a/70890803/18055780
 Sub CopyPaste(rPaste As Range, rCopy As Range, Optional val As Boolean = True)
  Dim aCalculation As XlCalculation
@@ -224,4 +201,39 @@ Private Function XlCalc(Optional aCalculation As Long = 0) As XlCalculation
  Else
   Application.Calculation = aCalculation
  End If
+End Function
+
+'https://stackoverflow.com/a/70916088/18055780
+Sub SaveAsAddIn()
+ 'Alt+F8 SaveAsAddIn Run
+ Dim sName As String
+ Dim sFilename As String
+ Dim ws As Worksheet
+ On Error GoTo Finally
+ With Application.ThisWorkbook
+  sName = SplitS(0, .Name, ".") 'name of ThisWorkbook without extension
+  sFilename = Application.UserLibraryPath & sName & ".xlam"
+  .Save
+  .Worksheets.Add After:=.Worksheets(.Worksheets.Count) 'add a blank sheet at the end
+  On Error Resume Next
+  Application.AddIns(sName).Installed = False 'uninstall the previous version of the AddIn
+  SetAttr sFilename, vbNormal
+  Kill sFilename
+  Application.DisplayAlerts = False
+  For Each ws In .Worksheets  'delete all sheets except the last one
+   ws.Delete
+  Next
+  .SaveAs Filename:=sFilename, FileFormat:=xlOpenXMLAddIn 'save ThisWorkbook as AddIn
+  Application.AddIns(sName).Installed = True 'install ThisWorkbook as AddIn
+  .Close
+  Application.DisplayAlerts = True
+ End With
+Finally:
+End Sub
+
+Function SplitS(Index As Long, Expression As String, Optional Delimiter As String = " ", Optional Limit As Long = -1, Optional Compare As VbCompareMethod = vbBinaryCompare) As String
+ Dim aExpression() As String
+ SplitS = ""
+ aExpression = Split(Expression, Delimiter, Limit, Compare)
+ If LBound(aExpression) <= Index And Index <= UBound(aExpression) Then SplitS = aExpression(Index)
 End Function

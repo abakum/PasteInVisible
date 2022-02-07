@@ -22,6 +22,7 @@ Private Const CF_LOCALE = 16
  Private Declare PtrSafe Function EmptyClipboard Lib "user32" () As Long
  Private Declare PtrSafe Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
  Private Declare PtrSafe Function GetClipboardFormatName Lib "user32" Alias "GetClipboardFormatNameA" (ByVal wFormat As Long, ByVal lpString As String, ByVal nMaxCount As Long) As Long
+ Declare PtrSafe Function CountClipboardFormats Lib "user32" () As Long
  
  Private Declare PtrSafe Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As LongPtr) As LongPtr
  Private Declare PtrSafe Function GlobalLock Lib "kernel32" (ByVal hMem As LongPtr) As LongPtr
@@ -44,6 +45,7 @@ Private Const CF_LOCALE = 16
  Private Declare Function EmptyClipboard Lib "user32" () As Long
  Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
  Private Declare Function GetClipboardFormatName Lib "user32" Alias "GetClipboardFormatNameA" (ByVal wFormat As Long, ByVal lpString As String, ByVal nMaxCount As Long) As Long
+ Declare Function CountClipboardFormats Lib "user32" () As Long
  
  Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
  Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -307,7 +309,7 @@ Try:
 Finally:
 End Function
 
-Sub ClipboardFormats() 'https://stackoverflow.com/questions/50588906/meaning-of-clipboardformat-values-44-and-50
+Private Sub ClipboardFormats() 'https://stackoverflow.com/questions/50588906/meaning-of-clipboardformat-values-44-and-50
  Dim fmt As Long
  Dim fmtName As String
  'Dim iClipBoardFormatNumber As Long
@@ -356,7 +358,7 @@ Public Function GetClipboardFiles() As String()
  #End If
  Dim i As Long
  Dim aFiles() As String
- Dim sFileName As String * MAX_PATH
+ Dim sFilename As String * MAX_PATH
  Dim lFilesCount As Long
  If IsNull(IsClipboardFormatAvailable(CF_HDROP)) Then Exit Function
  If IsNull(OpenClipboard(0&)) Then Exit Function
@@ -367,7 +369,7 @@ Try:
  lFilesCount = DragQueryFile(hDrop, -1, vbNullString, 0)
  ReDim aFiles(lFilesCount - 1)
  For i = 0 To lFilesCount - 1
-  aFiles(i) = Left$(sFileName, DragQueryFile(hDrop, i, sFileName, Len(sFileName)))
+  aFiles(i) = Left$(sFilename, DragQueryFile(hDrop, i, sFilename, Len(sFilename)))
  Next
  GetClipboardFiles = aFiles
 Finally:

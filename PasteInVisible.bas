@@ -1,7 +1,7 @@
 Attribute VB_Name = "PasteInVisible"
 Option Explicit
 
-Sub WB_BeforeClose()
+Sub WB_BeforeClose(Optional hide_from_Macros_dialog_box As Boolean)
  'вызывается из Workbook_BeforeClose
  Application.OnKey "+^c"
  Application.OnKey "+^v"
@@ -9,7 +9,7 @@ Sub WB_BeforeClose()
  Application.OnKey "+^k"
 End Sub
 
-Sub WB_Open()
+Sub WB_Open(Optional hide_from_Macros_dialog_box As Boolean)
  'вызывается из Workbook_Open
  Application.OnKey "+^c", "SelectVisible"
  Application.OnKey "+^v", "PasteV"
@@ -17,7 +17,7 @@ Sub WB_Open()
  Application.OnKey "+^k", "PasteK"
 End Sub
 
-Sub SelectVisible()
+Sub SelectVisible(Optional hide_from_Macros_dialog_box As Boolean)
  'Shift+Ctrl+C
  'связный диапазон (СД) Selection.Areas.Count=1
  'фрагментированный диапазон (ФД) Selection.Areas.Count>1
@@ -34,13 +34,13 @@ Sub SelectVisible()
  Selection.Copy 'в буфер обмена (БО)
 End Sub
 
-Sub PasteV()
+Sub PasteV(Optional hide_from_Macros_dialog_box As Boolean)
  'Shift+Ctrl+V
  'только значения из ЗД вставляем в ВД
  PasteX True
 End Sub
 
-Sub PasteK()
+Sub PasteK(Optional hide_from_Macros_dialog_box As Boolean)
  'Shift+Ctrl+K
  'ключи это не пустые видимые ячейки ВД и ЗД
  'если хоть один ключ ВД отличается от ключа в ЗД значит не вставляем ни чего
@@ -92,8 +92,8 @@ Try:
  End If
  For p = 1 To rPaste.Areas.Count
   'уменьшаем размеры копирования до размеров вставки
-  With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(Application.WorksheetFunction.min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), _
-                                                               Application.WorksheetFunction.min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
+  With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(Application.min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), _
+                                                               Application.min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
    If key Then 'PasteK
     'сравниваем ключи
     For r = .Row To .Row + .Rows.Count - 1
@@ -146,23 +146,20 @@ Try:
 KeyE:
  MsgBox prompt:="Нечего вставлять", Title:="Ключи равны"
 KeyD:
- XlCalc aCalculation
  rCopy.Select
- Selection.Copy
- Exit Sub
 Finally:
  XlCalc aCalculation
 End Sub
 
 'https://stackoverflow.com/a/70890803/18055780
 Sub CopyPaste(rPaste As Range, rCopy As Range, Optional val As Boolean = True)
- Dim aCalculation As XlCalculation
  Dim p As Long
  Dim r As Long
  Dim c As Long
+ Dim aCalculation As XlCalculation
+ aCalculation = XlCalc()
  On Error GoTo Finally
 Try:
- aCalculation = XlCalc()
  If rPaste.Count = 1 Then
   r = rPaste.Areas(1).Row - rCopy.Areas(1).Row
   c = rPaste.Areas(1).Column - rCopy.Areas(1).Column
@@ -173,8 +170,8 @@ Try:
   Next 'p
  End If
  For p = 1 To rPaste.Areas.Count
-  With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(Application.WorksheetFunction.min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), _
-                                                               Application.WorksheetFunction.min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
+  With Cells(rCopy.Areas(p).Row, rCopy.Areas(p).Column).Resize(Application.min(rCopy.Areas(p).Rows.Count, rPaste.Areas(p).Rows.Count), _
+                                                               Application.min(rCopy.Areas(p).Columns.Count, rPaste.Areas(p).Columns.Count))
    If val Then
     If 1 Then 'faster
      rPaste.Areas(p) = .Value
@@ -192,15 +189,26 @@ Finally:
  XlCalc aCalculation
 End Sub
 
-Private Function XlCalc(Optional aCalculation As Long = 0) As XlCalculation
+Function XlCalc(Optional aCalculation As Long = 0) As XlCalculation
+ Dim bCleared As Boolean
+ Dim bCutCopyMode As Boolean
+ bCutCopyMode = Application.CutCopyMode
+ XlCalc = Application.Calculation
  Application.EnableEvents = aCalculation <> 0
  Application.ScreenUpdating = aCalculation <> 0
+ 'assignment to Application.Calculation clears the clipboard
  If aCalculation = 0 Then
-  XlCalc = Application.Calculation
-  Application.Calculation = xlCalculationManual
+  bCleared = XlCalc <> xlCalculationManual
+  If bCleared Then Application.Calculation = xlCalculationManual
  Else
-  Application.Calculation = aCalculation
+  If aCalculation = xlCalculationAutomatic Then Application.Calculate
+  bCleared = XlCalc <> aCalculation
+  If bCleared Then Application.Calculation = aCalculation
  End If
+ If Not bCleared Then Exit Function
+ If Not bCutCopyMode Then Exit Function
+ If Selection Is Nothing Then Exit Function
+ Selection.Copy 'restore clipboard
 End Function
 
 'https://stackoverflow.com/a/70916088/18055780
@@ -209,9 +217,13 @@ Sub SaveAsAddIn()
  Dim sName As String
  Dim sFilename As String
  Dim o As Object
+ Application.MacroOptions _
+  "SaveAsAddIn", _
+  "Save ThisWorkbook as AddIn" & vbCr & _
+  "Сохранить макросы в библиотеку"
  On Error GoTo Finally
 Try:
- With Application.ThisWorkbook
+ With ThisWorkbook
   sName = Split(.Name, ".")(0) 'name of ThisWorkbook without extension
   sFilename = Application.UserLibraryPath & sName & ".xlam"
   .Save
@@ -231,8 +243,3 @@ Try:
  End With
 Finally:
 End Sub
-
-Function SplitS(Index As Long, Expression As String, Optional Delimiter As String = " ", Optional Limit As Long = -1, Optional Compare As VbCompareMethod = vbBinaryCompare) As String
- On Error Resume Next
- SplitS = Split(Expression, Delimiter, Limit, Compare)(Index)
-End Function

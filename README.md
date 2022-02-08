@@ -5,7 +5,7 @@
 * Shift+Ctr+K is useful when consolidating parts of a table into a whole table.
 ## Usage: 
 * Ctrl+C - copy consecutive (CR) or fragmented by hidding, grouping or filtering range (FR) of visible cells to clipboard (CB)
-* Shift+Ctr+C - convert the selected range (SR) from CR or FR and save it (RR). Look [SelectVisible](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20SelectVisible(Optional%20hide_from_Macros_dialog_box%20As%20Boolean)), [Copy visible cells only](https://support.microsoft.com/en-us/office/copy-visible-cells-only-6e3a1f01-2884-4332-b262-8b814412847e)
+* Shift+Ctr+C - convert the selected range (SR) from CR or FR and save it (RR). Look [SelectVisible](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20SelectVisible), [Copy visible cells only](https://support.microsoft.com/en-us/office/copy-visible-cells-only-6e3a1f01-2884-4332-b262-8b814412847e)
 * Ctrl+D - replicate the first row of SR to the whole SR including rows hidden by grouping or filters
 * Shift+Ctr+C Ctrl+D - replicate the first row of SR to the entire RR, not including rows hidden by grouping or filters
 * Ctrl+R - replicate the first column of SR to the entire SR including columns hidden by grouping
@@ -13,11 +13,11 @@
 * If FR is in CB Ctrl+V - inserts from it into SR including cells hidden by grouping or filtering values and formats
 * If CR is in CB Ctrl + V - pastes from it into SR including cells hidden by grouping or filtering formulas and formats
 * Ctrl+C Ctrl+Alt+V - pastes CR or FR from CB to SD including cells hidden by grouping or filtering with choice of insertion type
-* Ctrl+C Shift+Ctr+X - Paste RR into SR without extending borders, not including cells hidden by grouping or filters. Look [PasteX](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20PasteX(Optional%20val%20As%20Boolean%20%3D%20False%2C%20Optional%20key%20As%20Boolean%20%3D%20False))
-* Ctrl+C Shift+Ctr+V - Paste RR into SR without extending borders and pasting values, not including cells hidden by grouping or filters. Look [PasteV](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20PasteV(Optional%20hide_from_Macros_dialog_box%20As%20Boolean))
-* Shift+Ctr+K -  same as in Shift+Ctr+V, but only empty cells (EC) are replaced and only if all key cells (not EC) are equal. Look [PasteK](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20PasteK(Optional%20hide_from_Macros_dialog_box%20As%20Boolean))
+* Ctrl+C Shift+Ctr+X - Paste RR into SR without extending borders, not including cells hidden by grouping or filters. Look [PasteX](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20PasteX)
+* Ctrl+C Shift+Ctr+V - Paste RR into SR without extending borders and pasting values, not including cells hidden by grouping or filters. Look [PasteV](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20PasteV)
+* Shift+Ctr+K -  same as in Shift+Ctr+V, but only empty cells (EC) are replaced and only if all key cells (not EC) are equal. Look [PasteK](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20PasteK)
 ## Installation:
-* Alt+F8 SaveAsAddIn Run - Save and set ThisWorkbook as AddIn. Look [SaveAsAddIn](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=a/70916088/18055780-,Sub%20SaveAsAddIn(),-%27Alt%2BF8%20SaveAsAddIn)
+* Alt+F8 SaveAsAddIn Run - Save and set ThisWorkbook as AddIn. Look [SaveAsAddIn](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20SaveAsAddIn)
 ## Сonsolidation example:
 * There is a table `Whole` that needs to be filled in by different parts (sections, branches, subdivisions)
 * Red `Part1&2` - the result of filling in the table `Whole`

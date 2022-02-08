@@ -5,7 +5,7 @@
 * Shift+Ctr+K is useful when consolidating parts of a table into a whole table.
 ## Usage: 
 * Ctrl+C - copy consecutive (CR) or fragmented by hidding, grouping or filtering range (FR) of visible cells to clipboard (CB)
-* Shift+Ctr+C - convert the selected range (SR) from CR or FR and save it (RR). Look [SelectVisible](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#L20), [Copy visible cells only](https://support.microsoft.com/en-us/office/copy-visible-cells-only-6e3a1f01-2884-4332-b262-8b814412847e)
+* Shift+Ctr+C - convert the selected range (SR) from CR or FR and save it (RR). Look [SelectVisible](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20SelectVisible(Optional%20hide_from_Macros_dialog_box%20As%20Boolean)), [Copy visible cells only](https://support.microsoft.com/en-us/office/copy-visible-cells-only-6e3a1f01-2884-4332-b262-8b814412847e)
 * Ctrl+D - replicate the first row of SR to the whole SR including rows hidden by grouping or filters
 * Shift+Ctr+C Ctrl+D - replicate the first row of SR to the entire RR, not including rows hidden by grouping or filters
 * Ctrl+R - replicate the first column of SR to the entire SR including columns hidden by grouping

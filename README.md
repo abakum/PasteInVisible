@@ -13,7 +13,7 @@
 * If FR is in CB Ctrl+V - inserts from it into SR including cells hidden by grouping or filtering values and formats
 * If CR is in CB Ctrl + V - pastes from it into SR including cells hidden by grouping or filtering formulas and formats
 * Ctrl+C Ctrl+Alt+V - pastes CR or FR from CB to SD including cells hidden by grouping or filtering with choice of insertion type
-* Ctrl+C Shift+Ctr+X - Paste RR into SR without extending borders, not including cells hidden by grouping or filters. Look [PasteX](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#L51)
+* Ctrl+C Shift+Ctr+X - Paste RR into SR without extending borders, not including cells hidden by grouping or filters. Look [PasteX](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20PasteX(Optional%20val%20As%20Boolean%20%3D%20False%2C%20Optional%20key%20As%20Boolean%20%3D%20False))
 * Ctrl+C Shift+Ctr+V - Paste RR into SR without extending borders and pasting values, not including cells hidden by grouping or filters. Look [PasteV](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#L37)
 * Shift+Ctr+K -  same as in Shift+Ctr+V, but only empty cells (EC) are replaced and only if all key cells (not EC) are equal. Look [PasteK](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#L43)
 ## Installation:

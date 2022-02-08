@@ -17,7 +17,7 @@
 * Ctrl+C Shift+Ctr+V - Paste RR into SR without extending borders and pasting values, not including cells hidden by grouping or filters. Look [PasteV](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20PasteV(Optional%20hide_from_Macros_dialog_box%20As%20Boolean))
 * Shift+Ctr+K -  same as in Shift+Ctr+V, but only empty cells (EC) are replaced and only if all key cells (not EC) are equal. Look [PasteK](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=Sub%20PasteK(Optional%20hide_from_Macros_dialog_box%20As%20Boolean))
 ## Installation:
-* Alt+F8 SaveAsAddIn Run - Save and set ThisWorkbook as AddIn. Look [SaveAsAddIn](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#L207)
+* Alt+F8 SaveAsAddIn Run - Save and set ThisWorkbook as AddIn. Look [SaveAsAddIn](https://github.com/abakum/PasteInVisible/blob/main/PasteInVisible.bas#:~:text=a/70916088/18055780-,Sub%20SaveAsAddIn(),-%27Alt%2BF8%20SaveAsAddIn)
 ## Сonsolidation example:
 * There is a table `Whole` that needs to be filled in by different parts (sections, branches, subdivisions)
 * Red `Part1&2` - the result of filling in the table `Whole`

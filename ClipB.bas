@@ -61,6 +61,7 @@ Private Const CF_LOCALE = 16
  Private Declare Function DragQueryFile Lib "shell32.dll" Alias "DragQueryFileA" (ByVal hDrop As Long, ByVal UINT As Long, ByVal lpStr As String, ByVal ch As Long) As Long
 #End If
 
+
 Sub SetClipboardUT(sUniText As String) 'https://docs.microsoft.com/en-us/office/vba/access/Concepts/Windows-API/send-information-to-the-clipboard
  'set sUniText as CF_UNICODETEXT and CF_TEXT to сlipboard
  'set GetKeyboardLayout as CF_LOCALE to сlipboard
@@ -375,3 +376,11 @@ Try:
 Finally:
  CloseClipboard
 End Function
+
+Public Function cr(ParamArray PAitems() As Variant) As String
+ cr = Replace(Join(PAitems, vbCr) & vbCr, "^", vbCr)
+End Function
+
+Sub SetClipB(ByVal sUniText As String)
+ SetClipboard sUniText
+End Sub

@@ -101,7 +101,7 @@ Try:
       'куда вставлять если не пусто значит ключ
       Set rP = Cells(r, c).Offset(rPaste.Areas(p).Row - rCopy.Areas(p).Row, _
                                   rPaste.Areas(p).Column - rCopy.Areas(p).Column)
-      Set rC = Cells(r, c) 'откуда пустые пропускаем иначе сравниваем с ключом
+      Set rC = rCopy.Worksheet.Cells(r, c) 'откуда пустые пропускаем иначе сравниваем с ключом
       If IsEmpty(rC) Then 'пропускаем
       Else 'не пропускаемые
        If IsEmpty(rP) Then 'не ключ
@@ -213,13 +213,15 @@ End Function
 
 'https://stackoverflow.com/a/70916088/18055780
 Sub SaveAsAddIn()
+Attribute SaveAsAddIn.VB_Description = "Save ThisWorkbook as AddIn\rСохранить макросы в библиотеку"
+Attribute SaveAsAddIn.VB_ProcData.VB_Invoke_Func = " \n14"
  'Alt+F8 SaveAsAddIn Run
  Dim sName As String
  Dim sFilename As String
  Dim o As Object
  Application.MacroOptions _
   "SaveAsAddIn", _
-  "Save ThisWorkbook as AddIn" & vbCr & _
+  "Save ThisWorkbook as AddIn" & vbLf & _
   "Сохранить макросы в библиотеку"
  On Error GoTo Finally
 Try:
